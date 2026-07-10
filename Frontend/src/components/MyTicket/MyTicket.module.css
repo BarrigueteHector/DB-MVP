@@ -1,0 +1,22 @@
+.container{
+    margin: 0;
+    
+    border-style: solid;
+    border-color: var(--primary-color);
+    border-width: 2px;
+    border-radius: 0.6rem;
+}
+
+.title{
+    font-size: 18px;
+}
+
+.text{
+    font-size: 14px;
+    padding: 0 15px 0 15px;
+}
+
+.container button{
+    font-size: 14px;
+    margin: 0 0 15px 0;
+}

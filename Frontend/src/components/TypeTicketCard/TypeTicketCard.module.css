@@ -1,0 +1,39 @@
+.container{
+    display: flex;
+    border-style: solid;
+    border-color: var(--primary-color);
+    border-width: 2px;
+    border-radius: 0.6rem;
+
+    padding: 10px;
+
+    margin-bottom: 10px;
+}
+
+.content{
+    margin: 0 30px
+}
+
+.text{
+    margin: 5px 0;
+}
+
+.text:first-child{
+    font-weight: bold;
+}
+
+.boton{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    font-size: 14px;
+}
+
+.boton button:disabled{
+    /* color: red; #CF321F */
+      color: #9e9e9e;
+  /* border-color: #9e9e9e; */
+  cursor: not-allowed;
+  opacity: 0.6;
+}

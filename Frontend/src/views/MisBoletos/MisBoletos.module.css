@@ -1,0 +1,25 @@
+.container{
+  margin-top: 50px
+}
+
+.pageTitle {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  font-weight: 900;
+  font-size: 18px;
+  margin: 0 0;
+}
+
+.successMessage {
+  color: var(--success-message-color);
+  min-height: 24px;
+}
+
+.ticket {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 30px;
+  padding: 0 20px;
+}

@@ -1,0 +1,33 @@
+.navbar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    margin-top: 30px;
+}
+
+.container_button {
+    display: flex;
+    font-size: 14px;
+    background-color: #1a1a1a; 
+    border-radius: 0.5rem;
+}
+
+.container_button .nav_button {
+    margin: 0 5px;
+}
+
+.container_button .nav_button:first-child{
+    margin-left: 15px;
+}
+
+.container_button .nav_button:last-child{
+    margin-right: 15px;
+}
+
+.active{
+    color: var(--primary-color);
+    box-sizing: border-box;
+}

@@ -1,0 +1,63 @@
+.overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(4px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.modal {
+  background: var(--bg-color, #1a1a1a);
+  border: 2px solid var(--primary-color);
+  border-radius: 0.8rem;
+  padding: 2rem;
+  width: 340px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  position: relative;
+}
+
+.closeBtn {
+  position: absolute;
+  top: 0.8rem;
+  right: 0.8rem;
+  background: none;
+  border: none;
+  color: inherit;
+  font-size: 1.2rem;
+  cursor: pointer;
+}
+
+.artista {
+  font-size: 1.4rem;
+  font-weight: 700;
+  text-align: center;
+  color: var(--primary-color);
+}
+
+.info {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  /* gap: 0.0rem; */
+  font-size: 14px;
+}
+
+.info p{
+    margin: 5px 0 5px 0;
+}
+
+.info p span {
+  font-weight: 700;
+}
+
+.qr {
+  padding: 0.8rem;
+  background: white;
+  border-radius: 0.4rem;
+}
