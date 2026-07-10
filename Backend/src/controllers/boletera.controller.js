@@ -2,68 +2,92 @@ const pool = require('../db');
 
 const listaEventos = async (req, res, next) => {
     try {
-        const result = await pool.query("SELECT artista, lugar, TO_CHAR(fecha, 'YYYY-MM-DD') AS fecha FROM eventoabc1");
-        
+        const result = await pool.query("SELECT eventoabc1.id, eventoabc1.artista, eventoabc1.lugar, TO_CHAR(eventoabc1.fecha, 'YYYY-MM-DD') AS fecha, TO_CHAR(eventoabc1.hora_inicio, 'HH24:MI') AS hora_inicio, SUM(tipos_boleto.boletos_disponibles)::INTEGER AS total_boletos FROM eventoabc1 LEFT JOIN tipos_boleto ON tipos_boleto.evento_id = eventoabc1.id GROUP BY eventoabc1.id ORDER BY fecha");
+
+        if (result.rows.length === 0) 
+            return res.status(404).json({ 
+                message: 'Events not found' 
+            });
+
         res.json(result.rows)
     } catch (error) {
-         next(error);
+        next(error);
     }
 }
 
 const infoEvento = async (req, res, next) => {
     try {
         const { id } = req.params;
-        // const result = await pool.query('SELECT artista, lugar, TO_CHAR(fecha, 'YYYY-MM-DD') AS fecha, hora_inicio FROM eventoabc1 WHERE id = $1', [id]);
-        const result = await pool.query('SELECT artista, boletos FROM eventoabc1 WHERE id = $1', [id]);
+        
+        const event = await pool.query("SELECT id, artista, lugar, TO_CHAR(fecha, 'YYYY-MM-DD') AS fecha, TO_CHAR(hora_inicio, 'HH24:MI') AS hora_inicio FROM eventoabc1 WHERE id = $1", [id]);
 
-
-        if (result.rows.length === 0) 
+        if (event.rows.length === 0)   
             return res.status(404).json({ 
-                message: 'Task not found' 
+                message: 'Event not found' 
             });
 
-        res.json(result.rows[0]);
+        const tiposBoleto = await pool.query("SELECT id, tipo, precio, boletos_disponibles FROM tipos_boleto WHERE evento_id = $1 ORDER BY precio", [id]);
+
+        // res.json(result.rows[0])
+
+        return res.json({
+            ...event.rows[0],
+            tipos_boleto: tiposBoleto.rows
+        })
     } catch (error) {
         next(error);
     }
 }
 
 const comprarBoleto = async (req, res, next) => {
+    try {
+        const result = await procesarCompra(req.params.tipo_boleto_id, req.user.id, req.params.evento_id);
+        res.json(reesult)
+    } catch (error) {
+        next(error)
+    }
+}
+
+const procesarCompra = async(tipo_boleto_id, usuario_id, evento_id) => {
     const client = await pool.connect();
 
     try {
-        const { id } = req.params;
-        const usuario_id = req.user.id
-
-        // Inicio de la transacción (evitamos la concurrencia)
         await client.query('BEGIN');
-        
-        const eventoCheck = await client.query('SELECT boletos FROM eventoabc1 WHERE id = $1 FOR UPDATE', [id]);
-        
-        if (eventoCheck.rows.length === 0){
+
+        const tipoCheck = await client.query('SELECT evento_id, boletos_disponibles FROM tipos_boleto WHERE id = $1 FOR UPDATE', [tipo_boleto_id]);
+
+        if(tipoCheck.rows.length === 0){
             await client.query('ROLLBACK');
-            return res.status(404).json({  
-                message: 'Evento no encontrado'
-            });
+            throw new Error('Ticket type not found');
         }
 
-        if (eventoCheck.rows[0].boletos <= 0){
+        if(tipoCheck.rows[0].boletos_disponibles <= 0){
             await client.query('ROLLBACK');
-            return res.status(400).json({ 
-                message: 'No hay boletos'
-            });
+            throw new Error('No tickets available');
         }
 
-        const result = await client.query('UPDATE eventoabc1 SET boletos = boletos - 1 WHERE id = $1 AND boletos > 0 RETURNING *', [id]);
+        // Evita la compra de más boletos
+        // const compra = await client.query('SELECT id FROM compras WHERE usuario_id = $1 AND evento_id = $2', [usuario_id, evento_id]);
 
-        await client.query('INSERT INTO compras (usuario_id, evento_id) VALUES ($1, $2)', [usuario_id, id]);
+        // if(compra.rows.length > 0){
+        //     await client.query('ROLLBACK');
+        //     throw new Error('You already bought a ticket for this event');
+        // }
+        
+        const result = await client.query('UPDATE tipos_boleto SET boletos_disponibles = boletos_disponibles - 1 WHERE id = $1 AND boletos_disponibles >= 0 RETURNING *', [tipo_boleto_id]);
+
+        const { v4: uuidv4 } = require('uuid');
+        const contenido_qr = uuidv4();
+
+        await client.query('INSERT INTO compras (usuario_id, evento_id, tipo_boleto_id, contenido_qr) VALUES ($1, $2, $3, $4)', [usuario_id, evento_id, tipo_boleto_id, contenido_qr]);
 
         await client.query('COMMIT');
-
-        return res.json(result.rows[0]);
+        
+        return result.rows[0];
     } catch (error) {
+        console.log("Error procesar compra: ", error.message);
         await client.query('ROLLBACK');
-        next(error);
+        throw error
     } finally {
         client.release();
     }
@@ -73,27 +97,63 @@ const misBoletos = async(req, res, next) => {
     const client = await pool.connect();
 
     try {
-        // const usuario_id = req.user.id;
+        const usuario_id = req.user.id;
 
-        const result = await client.query('SELECT * FROM compras');
-        // const result = await client.query('SELECT * FROM compras JOIN eventoabc1 ON compras.evento_id = eventoabc1.id WHERE compras.usuario_id = 1', [usuario_id]);
-
+        const result = await client.query("SELECT eventoabc1.artista, eventoabc1.lugar, TO_CHAR(eventoabc1.hora_inicio, 'HH24:MI') AS hora_inicio, TO_CHAR(eventoabc1.fecha, 'YYYY-MM-DD') AS fecha, compras.seccion, compras.asiento, tipos_boleto.tipo, compras.contenido_qr FROM compras JOIN eventoabc1 ON compras.evento_id = eventoabc1.id JOIN tipos_boleto ON tipos_boleto.id = compras.tipo_boleto_id WHERE compras.usuario_id = $1 ORDER BY eventoabc1.fecha", [usuario_id]);
+        
         if (result.rows.length === 0){
             return res.status(404).json({  
                 message: 'No has comprado boletos'
             });
         }
 
-        return res.json(result.rows[0]);
+        res.json(result.rows);
     } catch (error) {
-        console.log("a")
         next(error);
     }
+}
+
+const confirmarCompraB = async(req, res, next) => {
+    const { id } = req.params;
+    const usuario_id = req.user.id;
+
+    const result = await pool.query("SELECT id FROM compras WHERE usuario_id = $1 AND evento_id = $2", [usuario_id, id]);
+
+    if (result.rows.length === 0){
+        console.log("Compra no realizada");
+    } else {
+        console.log("Compra realizada");
+    }
+
+    res.json({
+        compraExitosa: result.rows.length > 0
+    });
+}
+
+const validarBoleto = async(req, res, next) => {
+    const { compra_id } = req.params;
+
+    const result = await pool.query("SELECT compras.id, eventoabc1.artista, eventoabc1.fecha, usuarios.nombre, tipos_boleto.tipo FROM compras JOIN eventoabc1 ON compras.evento_id = eventoabc1.id JOIN usuarios ON compras.usuario_id = usuarios.id JOIN tipos_boleto ON compras.tipo_boleto_id = tipos_boleto.id WHERE compras.id = $1", [compra_id]);
+
+    if (result.rows.length === 0){
+        return res.json({
+            valido: false,
+            message: 'Boleto no encontrado'
+        })
+    }
+
+    res.json({
+        valido: true,
+        boleto: result.rows[0]
+    });
 }
 
 module.exports = {
     listaEventos,
     infoEvento,
     comprarBoleto,
-    misBoletos
+    procesarCompra,
+    misBoletos,
+    confirmarCompraB,
+    validarBoleto
 }

@@ -21,4 +21,16 @@ const authRequired = (req, res, next) => {
     })
 }
 
-module.exports = authRequired;
+const staffRequired = (req, res, next) => {
+    if(req.user.rol !== 'staff')
+        return res.status(403).json({
+            message: 'Acceso denegado'
+        })
+    
+    next();
+}
+
+module.exports = {
+    authRequired, 
+    staffRequired
+};

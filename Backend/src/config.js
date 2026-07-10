@@ -12,5 +12,10 @@ module.exports = {
 
     auth:{
         secret_key: process.env.SECRET_KEY
+    },
+
+    payment:{
+        stripe_key: process.env.STRIPE_KEY,
+        stripe_webhook_key: process.env.STRIPE_WEBHOOK_KEY
     }
 }
