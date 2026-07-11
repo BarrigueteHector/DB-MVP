@@ -57,14 +57,14 @@ const Registro = () => {
 
                     <label className={styles.label}>
                         Apellido paterno
-                        <input type='text' {...register('apellidoP', { required: 'Nombre requerido'})}/>
+                        <input type='text' {...register('apellido_p', { required: 'Nombre requerido'})}/>
 
                         <p className={styles.errorMessage}> {errors.username?.message} </p>
                     </label>
 
                     <label className={styles.label}>
                         Apellido materno
-                        <input type='text' {...register('apellidoM')}/>
+                        <input type='text' {...register('apellido_m')}/>
 
                         <p className={styles.errorMessage}> {errors.username?.message} </p>
                     </label>
