@@ -1,3 +1,6 @@
 node_modules/
 .vscode/
 .env
+.neon
+skills-lock.json
+.agents

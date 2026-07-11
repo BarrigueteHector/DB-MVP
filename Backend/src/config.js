@@ -7,7 +7,8 @@ module.exports = {
         password: process.env.DB_PASSWORD,
         host: process.env.DB_HOST,
         port: process.env.DB_PORT,
-        database: process.env.DB_DATABASE
+        database: process.env.DB_DATABASE,
+        db_url: process.env.DB_URL
     },
 
     auth:{
@@ -17,5 +18,13 @@ module.exports = {
     payment:{
         stripe_key: process.env.STRIPE_KEY,
         stripe_webhook_key: process.env.STRIPE_WEBHOOK_KEY
+    },
+
+    back:{
+        port: process.env.PORT
+    },
+
+    urls:{
+        front: process.env.FRONTEND_URL
     }
 }

@@ -1,7 +1,8 @@
-const stripe = require('stripe')(process.env.STRIPE_KEY);
+const { payment, urls } = require('../config');
+
+const stripe = require('stripe')(payment.stripe_key);
 const pool = require('../db'); // ajusta al nombre real de tu conexión
 const { procesarCompra } = require('./boletera.controller');
-const { payment } = require('../config');
 
 const createCheckoutSession = async (req, res, next) => {
     try {
@@ -32,8 +33,8 @@ const createCheckoutSession = async (req, res, next) => {
             ],
                 
             mode: 'payment',
-            success_url: `${process.env.FRONTEND_URL}/mis-boletos?success=true&id=${evento_id}`,
-            cancel_url: `${process.env.FRONTEND_URL}/evento/${tipoBoleto.rows[0].evento_id}`,
+            success_url: `${urls.front}/mis-boletos?success=true&id=${evento_id}`,
+            cancel_url: `${urls.front}/evento/${tipoBoleto.rows[0].evento_id}`,
             
             metadata: {
                 tipo_boleto_id: tipo_boleto_id,

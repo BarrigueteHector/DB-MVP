@@ -7,10 +7,12 @@ const boleteraRoutes = require('./routes/boletera.routes');
 const authRoutes = require('./routes/auth.routes');
 const stripeRoutes = require('./routes/stripe.routes');
 
+const { back, urls } = require('./config');
+
 const app = express();
 
 app.use(cors({
-    origin: process.env.FRONTEND_URL,
+    origin: urls.front,
     credentials: true
 }));
 
@@ -37,5 +39,5 @@ app.use(stripeRoutes);
 //     })
 // })
 
-app.listen(process.env.PORT);
+app.listen(back.port);
 console.log("Server is OK");
