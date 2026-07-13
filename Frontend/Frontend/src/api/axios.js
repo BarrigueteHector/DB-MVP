@@ -5,6 +5,4 @@ const instance = axios.create({
     withCredentials: true
 })
 
-console.log('API URL:', import.meta.env.VITE_BACKEND_URL);
-
 export default instance;
