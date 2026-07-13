@@ -11,28 +11,6 @@
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-
-   /* Estilos propios */
-  --primary-color: #646cff;
-  --error-message-color: #ff0000;
-  --success-message-color: #20E810;
-
-  --input-border: 1px solid var(--primary-color);
-  
-  --normal-title-size: 30px;
-  --normal-font-size: 14px;
-  --normal-message-size: 12px;
-  --normal-text-size: 16px;
-
-  --tablet-title-size: 24px;
-  --tablet-font-size: 12px;
-  --tablet-message-size: 10px;
-  --tablet-text-size: 14px;
-
-  --phone-title-size: 20px;
-  --phone-font-size: 10px;
-  --phone-message-size: 8px;
-  --phone-text-size: 12px;
 }
 
 a {
