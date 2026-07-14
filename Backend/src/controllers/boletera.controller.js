@@ -131,9 +131,9 @@ const confirmarCompraB = async(req, res, next) => {
 }
 
 const validarBoleto = async(req, res, next) => {
-    const { compra_id } = req.params;
+    const { contenido_qr } = req.params;
 
-    const result = await pool.query("SELECT compras.id, eventoabc1.artista, eventoabc1.fecha, usuarios.nombre, tipos_boleto.tipo FROM compras JOIN eventoabc1 ON compras.evento_id = eventoabc1.id JOIN usuarios ON compras.usuario_id = usuarios.id JOIN tipos_boleto ON compras.tipo_boleto_id = tipos_boleto.id WHERE compras.id = $1", [compra_id]);
+    const result = await pool.query("SELECT compras.id, eventoabc1.artista, eventoabc1.fecha, usuarios.nombre, tipos_boleto.tipo FROM compras JOIN eventoabc1 ON compras.evento_id = eventoabc1.id JOIN usuarios ON compras.usuario_id = usuarios.id JOIN tipos_boleto ON compras.tipo_boleto_id = tipos_boleto.id WHERE compras.contenido_qr = $1", [contenido_qr]);
 
     if (result.rows.length === 0){
         return res.json({

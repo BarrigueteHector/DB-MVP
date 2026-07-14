@@ -9,6 +9,6 @@ router.get('/info_evento/:id', infoEvento);
 router.post('/compra_boleto/:id', authRequired, comprarBoleto);
 router.get('/mis_boletos', authRequired, misBoletos);
 router.get('/confirmar_compra/:id', authRequired, confirmarCompraB );
-router.get('/validar_boleto/:compra_id', authRequired, staffRequired, validarBoleto);
+router.get('/validar_boleto/:contenido_qr', authRequired, staffRequired, validarBoleto);
 
 module.exports = router;
