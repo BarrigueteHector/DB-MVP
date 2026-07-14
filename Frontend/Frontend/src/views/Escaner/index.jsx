@@ -8,7 +8,7 @@ const Escaner = () => {
     // const scannerRef = useRef(null);
     const { validateTicket } = useEvent(); 
     const [resultado, setResultado] = useState(null);
-    const[escaneando, setEscaneando] = useState(true);
+    const [escaneando, setEscaneando] = useState(true);
     const scannerRef = useRef(null);
     const procesandoRef = useRef(false);
 
@@ -37,7 +37,7 @@ const Escaner = () => {
                 
                 try {
                     const res = await validateTicket(decodedText);
-                    if (res.data.valido) {
+                    if (res.valido) {
                         toast.success('Boleto válido');
                         setResultado({ valido: true, info: res.data });
                     } else {
@@ -67,7 +67,6 @@ const Escaner = () => {
     return(
         <div>
             {escaneando && <div id = 'reader' />}
-
 
         {
             resultado && (
